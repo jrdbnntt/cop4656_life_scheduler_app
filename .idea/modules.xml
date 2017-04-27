@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/../../../../extra/jbennett/dev/AndroidStudioProjects/LifeScheduler/LifeScheduler.iml" filepath="$PROJECT_DIR$/../../../../extra/jbennett/dev/AndroidStudioProjects/LifeScheduler/LifeScheduler.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../../../../extra/jbennett/dev/AndroidStudioProjects/LifeScheduler/app/app.iml" filepath="$PROJECT_DIR$/../../../../extra/jbennett/dev/AndroidStudioProjects/LifeScheduler/app/app.iml" />
+    </modules>
+  </component>
+</project>
