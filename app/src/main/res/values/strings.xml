@@ -20,5 +20,8 @@
     <string name="username">Username</string>
     <string name="log_in">Log In</string>
     <string name="life_scheduler_logo">Life Scheduler Logo</string>
+    <string name="action_schedule">Schedule</string>
+    <string name="action_top_goals">Top Goals</string>
+    <string name="action_log_out">Log Out</string>
 
 </resources>
