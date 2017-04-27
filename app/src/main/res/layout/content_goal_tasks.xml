@@ -5,7 +5,36 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:context="com.jrdbnntt.android.cop4656.lifescheduler.app.GoalTasksActivity"
-    tools:showIn="@layout/activity_goal_tasks">
+    tools:context="com.jrdbnntt.android.cop4656.lifescheduler.app.TopGoalsActivity"
+    tools:showIn="@layout/activity_top_goals">
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/sub_goals"/>
+
+        <ListView
+            android:id="@+id/lvGoals"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+        </ListView>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/activity_vertical_margin"
+            android:text="@string/tasks"/>
+
+        <ListView
+            android:id="@+id/lvTasks"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+        </ListView>
+
+    </LinearLayout>
 </android.support.constraint.ConstraintLayout>

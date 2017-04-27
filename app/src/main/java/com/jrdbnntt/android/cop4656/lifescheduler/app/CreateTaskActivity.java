@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -26,10 +27,10 @@ public class CreateTaskActivity extends AppCompatActivity {
     private EditText etDescription;
     private EditText etLocation;
     private EditText etPriority;
+    private EditText etEstimatedTime;
     private Button bSubmit;
     private LifeSchedulerApi api;
-    @Nullable
-    private Integer parent_goal_id = null;
+    private Integer parent_goal_id;
 
 
     public static Intent createIntentWithParams(Context context, Integer parent_goal_id) {
@@ -41,7 +42,7 @@ public class CreateTaskActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_create_goal);
+        setContentView(R.layout.activity_create_task);
         getParams();
         init();
     }
@@ -54,7 +55,8 @@ public class CreateTaskActivity extends AppCompatActivity {
 
         parent_goal_id = bundle.getInt(ARG_PARENT_GOAL_ID, -1);
         if (parent_goal_id == -1) {
-            parent_goal_id = null;
+            Log.e(this.getClass().getName(), "Missing required parent_goal_id param");
+            finish();
         }
     }
 
@@ -64,7 +66,8 @@ public class CreateTaskActivity extends AppCompatActivity {
         etTitle = (EditText) findViewById(R.id.etTitle);
         etDescription = (EditText) findViewById(R.id.etDescription);
         etLocation = (EditText) findViewById(R.id.etLocation);
-        etPriority = (EditText) findViewById(R.id.etDefaultLocation);
+        etPriority = (EditText) findViewById(R.id.etPriority);
+        etEstimatedTime = (EditText) findViewById(R.id.etEstimatedTime);
         bSubmit = (Button) findViewById(R.id.bSubmit);
 
         bSubmit.setOnClickListener(new View.OnClickListener() {
@@ -82,14 +85,19 @@ public class CreateTaskActivity extends AppCompatActivity {
         req.title = etTitle.getText().toString();
         req.location = etLocation.getText().toString();
         req.description = etDescription.getText().toString();
+        req.task_type = 2; // TODO
 
         try {
             text = etPriority.getText().toString();
             if (text.length() > 0) {
                 req.priority = Integer.parseInt(text);
             }
+            text = etEstimatedTime.getText().toString();
+            if (text.length() > 0) {
+                req.total_time_required_m = Integer.parseInt(text);
+            }
         } catch (NumberFormatException e) {
-            Toast.makeText(this, "Invalid priority number", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Invalid number", Toast.LENGTH_SHORT).show();
             return;
         }
 

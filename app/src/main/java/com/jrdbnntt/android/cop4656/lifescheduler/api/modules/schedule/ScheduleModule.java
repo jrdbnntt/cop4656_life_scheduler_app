@@ -79,7 +79,7 @@ public class ScheduleModule extends ApiModule<LifeSchedulerApi> {
             Response.Listener<GetGoalRequirementsResponse> res,
             Response.ErrorListener err
     ) {
-        api.sendPost("/schedule/get/goal_requirements$", req,
+        api.sendPost("/schedule/get/goal_requirements", req,
                 GetGoalRequirementsResponse.class, null, res, err);
     }
 
@@ -89,7 +89,7 @@ public class ScheduleModule extends ApiModule<LifeSchedulerApi> {
             Response.Listener<GetTimeAllotmentsResponse> res,
             Response.ErrorListener err
     ) {
-        api.sendPost("/schedule/get/time_allotments$", req,
+        api.sendPost("/schedule/get/time_allotments", req,
                 GetTimeAllotmentsResponse.class, null, res, err);
     }
 

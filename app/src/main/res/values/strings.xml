@@ -29,5 +29,11 @@
     <string name="default_priority">Default Priority</string>
     <string name="location">Location</string>
     <string name="priority">Priority</string>
+    <string name="placeholder_goal_title">Goal Title</string>
+    <string name="tasks">Tasks</string>
+    <string name="sub_goals">Sub Goals</string>
+    <string name="action_add_goal">Add Goal</string>
+    <string name="action_add_task">Add Task</string>
+    <string name="estimated_required_time_m">Estimated Required Time (m)</string>
 
 </resources>

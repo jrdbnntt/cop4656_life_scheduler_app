@@ -1,15 +1,39 @@
 package com.jrdbnntt.android.cop4656.lifescheduler.app;
 
+import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
+import android.widget.TextView;
+import android.widget.Toast;
 
+import com.android.volley.Response;
 import com.jrdbnntt.android.cop4656.lifescheduler.R;
+import com.jrdbnntt.android.cop4656.lifescheduler.api.LifeSchedulerApi;
+import com.jrdbnntt.android.cop4656.lifescheduler.api.modules.schedule.data.get.GetGoalRequirementsRequest;
+import com.jrdbnntt.android.cop4656.lifescheduler.api.modules.schedule.data.get.GetGoalRequirementsResponse;
+import com.jrdbnntt.android.cop4656.lifescheduler.api.modules.schedule.data.get.summary.GetSummaryOfGoalRequest;
+import com.jrdbnntt.android.cop4656.lifescheduler.api.modules.schedule.data.get.summary.GetSummaryOfGoalResponse;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Locale;
 
 public class TopGoalsActivity extends AppCompatActivity {
+
+    LifeSchedulerApi api;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -17,15 +41,93 @@ public class TopGoalsActivity extends AppCompatActivity {
         setContentView(R.layout.activity_top_goals);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        init();
+    }
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
+    public void init() {
+        api = new LifeSchedulerApi(this);
+
+        GetGoalRequirementsRequest req = new GetGoalRequirementsRequest();
+        api.getScheduleModule().getGoalRequirements(req, new Response.Listener<GetGoalRequirementsResponse>() {
             @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+            public void onResponse(GetGoalRequirementsResponse response) {
+                ListView lvGoals = (ListView) findViewById(R.id.lvGoals);
+                ArrayList<Integer> goalIds;
+                Log.d("ids", response.toString());
+
+                if (response.goal_ids != null) {
+                    goalIds = new ArrayList<>(Arrays.asList(response.goal_ids));
+                } else {
+                    goalIds = new ArrayList<>();
+                    Toast.makeText(getApplicationContext(), "You have no goals, create one!", Toast.LENGTH_LONG).show();
+                }
+
+                final GoalAdapter adapter = new GoalAdapter(getApplicationContext(), goalIds);
+
+                lvGoals.setAdapter(adapter);
+                lvGoals.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                        Integer goalId = adapter.getItem(position);
+                        if (goalId == null) {
+                            return;
+                        }
+                        startActivity(GoalTasksActivity.createIntentWithParams(
+                                getApplicationContext(), goalId
+                        ));
+                    }
+                });
             }
-        });
+        }, api.dialogErrorListener(this));
+    }
+
+    public class GoalAdapter extends ArrayAdapter<Integer> {
+        public GoalAdapter(@NonNull Context context, ArrayList<Integer> histories) {
+            super(context, 0, histories);
+        }
+
+        @NonNull
+        @Override
+        public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
+            Integer goalId = getItem(position);
+
+            if (convertView == null) {
+                convertView = LayoutInflater.from(getContext()).inflate(R.layout.item_goal_summary, parent, false);
+            }
+
+            final TextView tvGoalTitle = (TextView) convertView.findViewById(R.id.tvGoalTitle);
+            tvGoalTitle.setText("");
+
+            GetSummaryOfGoalRequest req = new GetSummaryOfGoalRequest();
+            req.goal_id = goalId;
+            api.getScheduleModule().getSummaryOfGoal(req, new Response.Listener<GetSummaryOfGoalResponse>() {
+                @Override
+                public void onResponse(GetSummaryOfGoalResponse response) {
+                    Log.d("summary", response.toString());
+                    tvGoalTitle.setText(response.title);
+                }
+            }, api.dialogErrorListener(getApplicationContext()));
+
+            return convertView;
+        }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.activity_top_goals, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+
+        if (id == R.id.action_add_goal) {
+            startActivity(CreateGoalActivity.createIntentWithParams(getApplicationContext(), null));
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
     }
 
 }
