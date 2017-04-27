@@ -1,8 +1,12 @@
 <resources>
     <string name="app_name">Life Scheduler</string>
 
-    <string name="title_activity_main">Main Activity - TODO</string>
+    <string name="title_activity_main">Schedule</string>
     <string name="title_activity_register">Register</string>
+    <string name="title_activity_goal_tasks">Goal Tasks</string>
+    <string name="title_activity_top_goals">Top Goals</string>
+    <string name="title_activity_create_goal">Create New Goal</string>
+    <string name="title_activity_create_task">Create New Task</string>
 
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
@@ -16,4 +20,5 @@
     <string name="username">Username</string>
     <string name="log_in">Log In</string>
     <string name="life_scheduler_logo">Life Scheduler Logo</string>
+
 </resources>
