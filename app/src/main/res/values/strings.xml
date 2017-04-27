@@ -23,5 +23,11 @@
     <string name="action_schedule">Schedule</string>
     <string name="action_top_goals">Top Goals</string>
     <string name="action_log_out">Log Out</string>
+    <string name="title">Title</string>
+    <string name="description">Description</string>
+    <string name="defaultLocation">Default Location</string>
+    <string name="default_priority">Default Priority</string>
+    <string name="location">Location</string>
+    <string name="priority">Priority</string>
 
 </resources>

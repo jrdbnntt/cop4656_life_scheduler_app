@@ -38,8 +38,11 @@
             android:label="@string/title_activity_top_goals"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".app.CreateTaskActivity" />
-        <activity android:name=".app.CreateGoalActivity"></activity>
+            android:name=".app.CreateTaskActivity"
+            android:label="@string/title_activity_create_task"/>
+        <activity
+            android:name=".app.CreateGoalActivity"
+            android:label="@string/title_activity_create_goal"/>
     </application>
 
 </manifest>
