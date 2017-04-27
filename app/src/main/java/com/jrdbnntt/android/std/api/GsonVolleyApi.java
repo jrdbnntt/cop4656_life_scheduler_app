@@ -10,6 +10,8 @@ import com.android.volley.VolleyError;
 import com.google.gson.Gson;
 import com.jrdbnntt.android.std.api.data.ErrorResponse;
 import com.jrdbnntt.android.std.api.data.GsonObject;
+import com.jrdbnntt.android.std.api.data.GsonRequest;
+import com.jrdbnntt.android.std.api.data.GsonResponse;
 
 import java.util.Map;
 
@@ -41,7 +43,7 @@ public abstract class GsonVolleyApi {
         VolleyManager.getInstance(context).addToRequestQueue(request);
     }
 
-    public <Res extends GsonObject> void sendGet(
+    public <Res extends GsonResponse> void sendGet(
             String localUrl,
             Class<Res> responseClass,
             Response.Listener<Res> responseListener,
@@ -50,7 +52,7 @@ public abstract class GsonVolleyApi {
         sendGet(localUrl, responseClass, null, responseListener,errorListener);
     }
 
-    public <Req extends GsonObject, Res extends GsonObject> void sendPost(
+    public <Req extends GsonRequest, Res extends GsonResponse> void sendPost(
             String localUrl,
             Req requestObject,
             Class<Res> responseClass,
@@ -65,7 +67,7 @@ public abstract class GsonVolleyApi {
         VolleyManager.getInstance(context).addToRequestQueue(request);
     }
 
-    public <Req extends GsonObject, Res extends GsonObject> void sendPost(
+    public <Req extends GsonRequest, Res extends GsonResponse> void sendPost(
             String localUrl,
             String requestJson,
             Class<Res> responseClass,
@@ -80,7 +82,7 @@ public abstract class GsonVolleyApi {
         VolleyManager.getInstance(context).addToRequestQueue(request);
     }
 
-    public <Req extends GsonObject, Res extends GsonObject> void sendPost(
+    public <Req extends GsonRequest, Res extends GsonResponse> void sendPost(
             String localUrl,
             Req requestObject,
             Class<Res> responseClass,
