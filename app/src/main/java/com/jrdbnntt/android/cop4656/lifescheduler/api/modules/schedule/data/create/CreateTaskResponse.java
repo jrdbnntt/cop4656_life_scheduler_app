@@ -6,4 +6,5 @@ import com.jrdbnntt.android.std.api.data.GsonResponse;
  * TODO
  */
 public class CreateTaskResponse extends GsonResponse {
+    public Integer task_id;
 }

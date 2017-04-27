@@ -6,5 +6,5 @@ import com.jrdbnntt.android.std.api.data.GsonResponse;
  * TODO
  */
 public class CreateGoalResponse extends GsonResponse {
-    Integer goal_id;
+    public Integer goal_id;
 }

@@ -7,4 +7,7 @@ import com.jrdbnntt.android.std.api.data.GsonRequest;
  */
 
 public class GetTimeAllotmentsRequest extends GsonRequest {
+    // Optional
+    public Boolean past;
+    public Boolean complete_tasks;
 }

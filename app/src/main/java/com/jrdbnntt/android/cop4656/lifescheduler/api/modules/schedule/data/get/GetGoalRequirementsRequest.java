@@ -7,4 +7,5 @@ import com.jrdbnntt.android.std.api.data.GsonRequest;
  */
 
 public class GetGoalRequirementsRequest extends GsonRequest {
+    public Integer parent_goal_id;
 }

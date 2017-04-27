@@ -6,4 +6,5 @@ import com.jrdbnntt.android.std.api.data.GsonRequest;
  * TODO
  */
 public class GetSummaryOfGoalRequest extends GsonRequest {
+    public Integer goal_id;
 }

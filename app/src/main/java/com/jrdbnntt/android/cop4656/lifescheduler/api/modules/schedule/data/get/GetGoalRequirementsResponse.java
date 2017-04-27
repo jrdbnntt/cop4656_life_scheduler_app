@@ -7,4 +7,6 @@ import com.jrdbnntt.android.std.api.data.GsonResponse;
  */
 
 public class GetGoalRequirementsResponse extends GsonResponse {
+    public Integer[] goal_ids;
+    public Integer[] task_ids;
 }

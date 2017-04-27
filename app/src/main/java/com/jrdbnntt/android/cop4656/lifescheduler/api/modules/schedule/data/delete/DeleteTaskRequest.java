@@ -6,4 +6,5 @@ import com.jrdbnntt.android.std.api.data.GsonRequest;
  * TODO
  */
 public class DeleteTaskRequest extends GsonRequest {
+    public Integer task_id;
 }
