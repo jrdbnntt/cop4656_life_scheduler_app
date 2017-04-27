@@ -11,7 +11,7 @@ import com.jrdbnntt.android.std.api.GsonVolleyApi;
  */
 public class LifeSchedulerApi extends GsonVolleyApi {
 
-    private static final String BASE_URL = "https://lifescheduler.cop4656.jrdbnntt.com/api";
+    private static final String BASE_URL = "https://lifescheduler.jrdbnntt.com/api";
 
     private UserModule userModule;
 
