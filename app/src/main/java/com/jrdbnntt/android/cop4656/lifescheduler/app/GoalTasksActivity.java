@@ -76,7 +76,7 @@ public class GoalTasksActivity extends AppCompatActivity {
         final ListView lvGoals = (ListView) findViewById(R.id.lvGoals);
         final ListView lvTasks = (ListView) findViewById(R.id.lvTasks);
         GetGoalRequirementsRequest req = new GetGoalRequirementsRequest();
-
+        req.parent_goal_id = parent_goal_id;
         api.getScheduleModule().getGoalRequirements(req, new Response.Listener<GetGoalRequirementsResponse>() {
             @Override
             public void onResponse(GetGoalRequirementsResponse response) {
