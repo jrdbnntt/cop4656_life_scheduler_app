@@ -3,44 +3,32 @@ package com.jrdbnntt.android.cop4656.lifescheduler.app;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
-import android.widget.TextView;
-import android.widget.Toast;
 
 import com.android.volley.Response;
 import com.jrdbnntt.android.cop4656.lifescheduler.R;
 import com.jrdbnntt.android.cop4656.lifescheduler.api.LifeSchedulerApi;
 import com.jrdbnntt.android.cop4656.lifescheduler.api.modules.schedule.data.get.GetGoalRequirementsRequest;
 import com.jrdbnntt.android.cop4656.lifescheduler.api.modules.schedule.data.get.GetGoalRequirementsResponse;
-import com.jrdbnntt.android.cop4656.lifescheduler.api.modules.schedule.data.get.summary.GetSummaryOfGoalRequest;
-import com.jrdbnntt.android.cop4656.lifescheduler.api.modules.schedule.data.get.summary.GetSummaryOfGoalResponse;
-import com.jrdbnntt.android.cop4656.lifescheduler.api.modules.schedule.data.get.summary.GetSummaryOfTaskRequest;
-import com.jrdbnntt.android.cop4656.lifescheduler.api.modules.schedule.data.get.summary.GetSummaryOfTaskResponse;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 
 public class GoalTasksActivity extends AppCompatActivity {
 
-    private static final String ARG_PARENT_GOAL_ID = "parent_goal_id";
+    private static final String ARG_PARENT_GOAL_ID = "parentGoalId";
 
-    private Integer parent_goal_id;
-    LifeSchedulerApi api;
-
+    private Integer parentGoalId;
+    private LifeSchedulerApi api;
+    private GoalAdapter goalAdapter;
+    private TaskAdapter taskAdapter;
 
     public static Intent createIntentWithParams(Context context, Integer parent_goal_id) {
         Intent intent = new Intent(context, GoalTasksActivity.class);
@@ -64,57 +52,80 @@ public class GoalTasksActivity extends AppCompatActivity {
             return;
         }
 
-        parent_goal_id = bundle.getInt(ARG_PARENT_GOAL_ID, -1);
-        if (parent_goal_id == -1) {
-            Log.e(this.getClass().getName(), "Missing required parent_goal_id param");
+        parentGoalId = bundle.getInt(ARG_PARENT_GOAL_ID, -1);
+        if (parentGoalId == -1) {
+            Log.e(this.getClass().getName(), "Missing required parentGoalId param");
             finish();
         }
     }
 
     public void init() {
         api = new LifeSchedulerApi(this);
-        final ListView lvGoals = (ListView) findViewById(R.id.lvGoals);
-        final ListView lvTasks = (ListView) findViewById(R.id.lvTasks);
+        ListView lvGoals = (ListView) findViewById(R.id.lvGoals);
+        ListView lvTasks = (ListView) findViewById(R.id.lvTasks);
+        goalAdapter = new GoalAdapter(this, new ArrayList<Integer>(), api, parentGoalId);
+        lvGoals.setAdapter(goalAdapter);
+        lvGoals.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Integer goalId = goalAdapter.getItem(position);
+                if (goalId == null) {
+                    return;
+                }
+                startActivity(GoalTasksActivity.createIntentWithParams(
+                        getApplicationContext(), goalId
+                ));
+            }
+        });
+
+        taskAdapter = new TaskAdapter(this, new ArrayList<Integer>(), api);
+        lvTasks.setAdapter(taskAdapter);
+        lvTasks.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Integer taskId = taskAdapter.getItem(position);
+                if (taskId == null) {
+                    return;
+                }
+                // TODO edit task
+            }
+        });
+
+        updateGoalsAndTasks();
+
+    }
+
+    @Override
+    protected void onPostResume() {
+        super.onPostResume();
+        updateGoalsAndTasks();
+    }
+
+    private void updateGoalsAndTasks() {
         GetGoalRequirementsRequest req = new GetGoalRequirementsRequest();
-        req.parent_goal_id = parent_goal_id;
+        req.parent_goal_id = parentGoalId;
         api.getScheduleModule().getGoalRequirements(req, new Response.Listener<GetGoalRequirementsResponse>() {
             @Override
             public void onResponse(GetGoalRequirementsResponse response) {
-                Log.d("ids", response.toString());
-                ArrayList<Integer> goalIds = new ArrayList<>(Arrays.asList(response.goal_ids));;
-                ArrayList<Integer> taskIds = new ArrayList<>(Arrays.asList(response.task_ids));;
+                goalAdapter.clear();
+                taskAdapter.clear();
 
-                final GoalAdapter goalAdapter = new GoalAdapter(getApplicationContext(), goalIds);
-                lvGoals.setAdapter(goalAdapter);
-                lvGoals.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                    @Override
-                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                        Integer goalId = goalAdapter.getItem(position);
-                        if (goalId == null) {
-                            return;
-                        }
-                        startActivity(GoalTasksActivity.createIntentWithParams(
-                                getApplicationContext(), goalId
-                        ));
-                    }
-                });
+                if (response.goal_ids != null) {
+                    goalAdapter.addAll(new ArrayList<>(Arrays.asList(response.goal_ids)));
 
-                final TaskAdapter taskAdapter = new TaskAdapter(getApplicationContext(), taskIds);
-                lvTasks.setAdapter(taskAdapter);
-                lvTasks.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                    @Override
-                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                        Integer taskId = taskAdapter.getItem(position);
-                        if (taskId == null) {
-                            return;
-                        }
-                        // TODO
-                    }
-                });
+                }
+                if (response.task_ids != null) {
+                    taskAdapter.addAll(new ArrayList<>(Arrays.asList(response.task_ids)));
+                }
+
+                taskAdapter.notifyDataSetChanged();
+                goalAdapter.notifyDataSetChanged();
+
+                Log.v("Goals", "updated, " + goalAdapter.getCount() + " total");
             }
         }, api.dialogErrorListener(this));
-
     }
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -128,76 +139,20 @@ public class GoalTasksActivity extends AppCompatActivity {
 
         if (id == R.id.action_add_goal) {
             startActivity(CreateGoalActivity.createIntentWithParams(
-                    getApplicationContext(), parent_goal_id
+                    getApplicationContext(), parentGoalId
             ));
             return true;
         } else if (id == R.id.action_add_task) {
             startActivity(CreateTaskActivity.createIntentWithParams(
-                    getApplicationContext(), parent_goal_id
+                    getApplicationContext(), parentGoalId
             ));
         }
 
         return super.onOptionsItemSelected(item);
     }
 
-    public class GoalAdapter extends ArrayAdapter<Integer> {
-        public GoalAdapter(@NonNull Context context, ArrayList<Integer> histories) {
-            super(context, 0, histories);
-        }
 
-        @NonNull
-        @Override
-        public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
-            Integer goalId = getItem(position);
 
-            if (convertView == null) {
-                convertView = LayoutInflater.from(getContext()).inflate(R.layout.item_goal_summary, parent, false);
-            }
 
-            final TextView tvGoalTitle = (TextView) convertView.findViewById(R.id.tvGoalTitle);
-            tvGoalTitle.setText("");
-
-            GetSummaryOfGoalRequest req = new GetSummaryOfGoalRequest();
-            req.goal_id = goalId;
-            api.getScheduleModule().getSummaryOfGoal(req, new Response.Listener<GetSummaryOfGoalResponse>() {
-                @Override
-                public void onResponse(GetSummaryOfGoalResponse response) {
-                    tvGoalTitle.setText(response.title);
-                }
-            }, api.dialogErrorListener(getApplicationContext()));
-
-            return convertView;
-        }
-    }
-
-    public class TaskAdapter extends ArrayAdapter<Integer> {
-        public TaskAdapter(@NonNull Context context, ArrayList<Integer> histories) {
-            super(context, 0, histories);
-        }
-
-        @NonNull
-        @Override
-        public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
-            Integer taskId = getItem(position);
-
-            if (convertView == null) {
-                convertView = LayoutInflater.from(getContext()).inflate(R.layout.item_goal_summary, parent, false);
-            }
-
-            final TextView tvTitle = (TextView) convertView.findViewById(R.id.tvGoalTitle);
-            tvTitle.setText("");
-
-            GetSummaryOfTaskRequest req = new GetSummaryOfTaskRequest();
-            req.task_id = taskId;
-            api.getScheduleModule().getSummaryOfTask(req, new Response.Listener<GetSummaryOfTaskResponse>() {
-                @Override
-                public void onResponse(GetSummaryOfTaskResponse response) {
-                    tvTitle.setText(response.title);
-                }
-            }, api.dialogErrorListener(getApplicationContext()));
-
-            return convertView;
-        }
-    }
 
 }
