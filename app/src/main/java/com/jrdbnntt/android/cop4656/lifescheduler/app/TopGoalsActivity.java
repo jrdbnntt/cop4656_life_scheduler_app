@@ -34,6 +34,9 @@ import java.util.Locale;
 public class TopGoalsActivity extends AppCompatActivity {
 
     LifeSchedulerApi api;
+    ArrayList<Integer> goalIds = new ArrayList<>();
+    ListView lvGoals;
+    GoalAdapter goalAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,39 +49,48 @@ public class TopGoalsActivity extends AppCompatActivity {
 
     public void init() {
         api = new LifeSchedulerApi(this);
+        lvGoals = (ListView) findViewById(R.id.lvGoals);
+        goalAdapter = new GoalAdapter(getApplicationContext(), goalIds);
 
+        lvGoals.setAdapter(goalAdapter);
+        lvGoals.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Integer goalId = goalAdapter.getItem(position);
+                if (goalId == null) {
+                    return;
+                }
+                startActivity(GoalTasksActivity.createIntentWithParams(
+                        getApplicationContext(), goalId
+                ));
+            }
+        });
+        updateGoals();
+    }
+
+    public void updateGoals() {
         GetGoalRequirementsRequest req = new GetGoalRequirementsRequest();
         api.getScheduleModule().getGoalRequirements(req, new Response.Listener<GetGoalRequirementsResponse>() {
             @Override
             public void onResponse(GetGoalRequirementsResponse response) {
-                ListView lvGoals = (ListView) findViewById(R.id.lvGoals);
-                ArrayList<Integer> goalIds;
-                Log.d("ids", response.toString());
+                goalAdapter.clear();
 
                 if (response.goal_ids != null) {
-                    goalIds = new ArrayList<>(Arrays.asList(response.goal_ids));
+                    goalAdapter.addAll(new ArrayList<>(Arrays.asList(response.goal_ids)));
+
                 } else {
-                    goalIds = new ArrayList<>();
                     Toast.makeText(getApplicationContext(), "You have no goals, create one!", Toast.LENGTH_LONG).show();
                 }
 
-                final GoalAdapter adapter = new GoalAdapter(getApplicationContext(), goalIds);
-
-                lvGoals.setAdapter(adapter);
-                lvGoals.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                    @Override
-                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                        Integer goalId = adapter.getItem(position);
-                        if (goalId == null) {
-                            return;
-                        }
-                        startActivity(GoalTasksActivity.createIntentWithParams(
-                                getApplicationContext(), goalId
-                        ));
-                    }
-                });
+                Log.v("Goals", "updated, " + goalAdapter.getCount() + " total");
             }
         }, api.dialogErrorListener(this));
+    }
+
+    @Override
+    protected void onPostResume() {
+        super.onPostResume();
+        updateGoals();
     }
 
     public class GoalAdapter extends ArrayAdapter<Integer> {
@@ -103,7 +115,6 @@ public class TopGoalsActivity extends AppCompatActivity {
             api.getScheduleModule().getSummaryOfGoal(req, new Response.Listener<GetSummaryOfGoalResponse>() {
                 @Override
                 public void onResponse(GetSummaryOfGoalResponse response) {
-                    Log.d("summary", response.toString());
                     tvGoalTitle.setText(response.title);
                 }
             }, api.dialogErrorListener(getApplicationContext()));
